@@ -6,6 +6,8 @@ Built with **Fira Code v6.002** and **Nerd Fonts 3.4.0** — includes all v6 lig
 
 ## Ligature samples
 
+![Ligatures preview](ligatures-preview.png)
+
 Set your terminal font to **SFMono Nerd Font** and enable ligatures, then paste these:
 
 ```python
