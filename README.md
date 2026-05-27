@@ -1,134 +1,92 @@
-# SF Mono Nerd Font + Fira Code Ligatures
+# Apple SF Mono + Nerd Font + Fira Code Ligatures
 
-Patches SF Mono with Nerd Font glyphs (step 1) then injects Fira Code `calt` ligatures (step 2).
-
-Built with **Fira Code v6.002** and **Nerd Fonts 3.4.0** — includes all v6 ligatures (`<$>`, `<*>`, `<~~`, `~~>`, `[<]`, `[>]`, `</>`, `<==>`, etc.) and the full Nerd Fonts v3 glyph set.
-
-## Ligature samples
+SF Mono patched with [Nerd Fonts 3.4.0](https://github.com/ryanoasis/nerd-fonts/releases/tag/v3.4.0) glyphs and [Fira Code v6.2](https://github.com/tonsky/FiraCode/releases/tag/6.2) ligatures. All 12 weights and styles.
 
 ![Ligatures preview](ligatures-preview.png)
 
-Set your terminal font to **SFMono Nerd Font** and enable ligatures, then paste these:
+---
 
-```python
-# Comparison / equality
-if x == y and a != b: pass
-if score >= 100 or rank <= 1: pass
-```
+## Install (pre-built)
 
-```javascript
-// Arrows
-const double = x => x * 2
-fetch(url).then(res => res.json()).then(data => console.log(data))
-```
-
-```javascript
-// Logic / comments
-const ok = isValid() && isReady() || isFallback()
-// single line   /* block */   <!-- html -->
-```
-
-```haskell
--- Functional operators
-fmap :: (a -> b) -> f a -> f b
-result = f <$> x <*> y
-```
-
-```elixir
-# Pipe / arrows
-"hello" |> String.upcase() |> IO.puts()
-x <~ stream
-```
-
-```python
-# Dots / colons
-def func(*args): ...
-std::vector<int> v;
-```
-
-**Enable ligatures:**
-- **Terminal.app** — Preferences → Profiles → Text → Font → SFMono Nerd Font → ✓ Use ligatures
-- **iTerm2** — Preferences → Profiles → Text → ✓ Use ligatures → font SFMono Nerd Font
-- **VS Code** — `"editor.fontFamily": "SFMono Nerd Font"`, `"editor.fontLigatures": true`
-
-## Prerequisites
-
-```bash
-# Step 1 — Nerd Font patcher requires FontForge
-brew install fontforge
-
-# Step 2 — Ligature patcher requires fontTools
-pip3 install fonttools
-```
-
-## Step 1 — Nerd Font patch
-
-Download the Nerd Fonts patcher and run it on every SF Mono weight:
-
-```bash
-# Download font-patcher (one-time)
-curl -LO https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/font-patcher
-curl -LO https://github.com/ryanoasis/nerd-fonts/raw/master/src/glyphs/FontAwesome.otf
-curl -LO https://github.com/ryanoasis/nerd-fonts/raw/master/src/glyphs/Symbols-2048-em Nerd Font Complete.ttf
-# Or clone the full repo for the complete glyph set:
-# git clone --depth 1 https://github.com/ryanoasis/nerd-fonts
-
-mkdir -p fonts/nerd-otf
-
-for f in fonts/SF-Mono-*.otf; do
-    fontforge -script font-patcher "$f" \
-        --complete \
-        --outputdir fonts/nerd-otf/ \
-        --no-progressbars \
-        2>/dev/null
-done
-```
-
-The patcher renames files (e.g. `SF-Mono-Regular.otf` → `SFMonoNerdFont-Regular.otf`) and places them in `fonts/nerd-otf/`.
-
-> **Already done:** `fonts/nerd-otf/` already contains the patched files. Only re-run this if you want to rebuild from the original SF Mono OTFs.
-
-## Step 2 — Inject Fira Code ligatures
-
-```bash
-python3 patch.py
-```
-
-Reads from `fonts/nerd-otf/`, outputs to `fonts/final/`. Processes all 12 weight/style pairs.
-
-## Step 3 — Install
+Either grab the fonts from the **Assets** section of the [latest GitHub release](../../releases/latest), or use the pre-built fonts already in the `fonts/final/` folder. Then copy and clear the cache:
 
 ```bash
 cp fonts/final/SFMonoNerdFont-*.otf ~/Library/Fonts/
-atsutil databases -removeUser   # clear macOS font cache
+atsutil databases -removeUser
 ```
 
-Then select **SFMono Nerd Font** in your editor with ligatures enabled.
+Then set your font to **SFMono Nerd Font** in your required terminal or editor:
 
-## Verify ligatures
+- **Terminal.app** — Preferences → Profiles → Text → Font
+- **VS Code** — `"editor.fontFamily": "SFMono Nerd Font"`, `"editor.fontLigatures": true`
+
+Done
+
+---
+
+## Rebuild from scratch
+
+### 1 — Nerd Font patch
+
+Requires SF Mono OTFs in `fonts/` — either download them from the `fonts/` folder in this repo or extract from Xcode / the SF Mono package.
 
 ```bash
-# Requires: brew install harfbuzz
-FONT=fonts/final/SFMonoNerdFont-Regular.otf
-for seq in "==" "!=" ">=" "<=" "=>" "===" "!==" "->" "--" "->>" "||" "&&" "..." "<>" "<|>"; do
-    echo -n "$seq: "
-    hb-shape "$FONT" --text="$seq"
+brew install fontforge
+git clone --depth 1 https://github.com/ryanoasis/nerd-fonts
+mkdir -p fonts/nerd-otf
+
+for f in fonts/SF-Mono-*.otf; do
+    fontforge -script nerd-fonts/font-patcher "$f" \
+        --complete --outputdir fonts/nerd-otf/ --no-progressbars 2>/dev/null
 done
 ```
 
-## Font sources
+### 2 — Inject ligatures
 
-- `fonts/SF-Mono-*.otf` — extracted from Xcode or the SF Mono package
-- `fonts/FiraCode-*.ttf` — [Fira Code v6.002](https://github.com/tonsky/FiraCode/releases/tag/6.2) (TTF, all weights)
-- `fonts/nerd-otf/` — output of step 1, patched with [Nerd Fonts 3.4.0](https://github.com/ryanoasis/nerd-fonts/releases/tag/v3.4.0)
-- `fonts/final/` — output of step 2 (final fonts to install)
+```bash
+pip3 install fonttools
+python3 patch.py
+# outputs to fonts/final/
+```
 
-## Weight mapping
+### 3 — Install
 
-| SF Mono weight | Fira Code source |
+```bash
+cp fonts/final/SFMonoNerdFont-*.otf ~/Library/Fonts/
+atsutil databases -removeUser
+```
+
+---
+
+## Test ligatures
+
+```bash
+./test-ligatures.sh
+```
+
+---
+
+## Weights & styles
+
+| Font | Style |
 |---|---|
-| Light, LightItalic | FiraCode-Light |
-| Regular, Italic | FiraCode-Regular |
-| Medium, MediumItalic | FiraCode-Medium |
-| SemiBold, SemiBoldItalic | FiraCode-SemiBold |
-| Bold, BoldItalic, Heavy, HeavyItalic | FiraCode-Bold |
+| SFMonoNerdFont-Light | Light |
+| SFMonoNerdFont-LightItalic | Light Italic |
+| SFMonoNerdFont-Regular | Regular |
+| SFMonoNerdFont-Italic | Italic |
+| SFMonoNerdFont-Medium | Medium |
+| SFMonoNerdFont-MediumItalic | Medium Italic |
+| SFMonoNerdFont-SemiBold | SemiBold |
+| SFMonoNerdFont-SemiBoldItalic | SemiBold Italic |
+| SFMonoNerdFont-Bold | Bold |
+| SFMonoNerdFont-BoldItalic | Bold Italic |
+| SFMonoNerdFont-Heavy | Heavy |
+| SFMonoNerdFont-HeavyItalic | Heavy Italic |
+
+---
+
+## Credits
+
+- **[SF Mono](https://developer.apple.com/fonts/)** — Apple
+- **[Fira Code](https://github.com/tonsky/FiraCode)** — Nikita Prokopov
+- **[Nerd Fonts](https://github.com/ryanoasis/nerd-fonts)** — Ryan L McIntyre
